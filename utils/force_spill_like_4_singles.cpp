@@ -95,7 +95,7 @@ void force_spill_like_4_singles(std::string input_file,
             h->Stop.SetT(event_time + stop_offset);
             }
         }
-        newTree->Fill()
+        newTree->Fill();
     }
     newTree->Write();
     geom->Write();
