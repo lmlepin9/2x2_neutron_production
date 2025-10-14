@@ -48,4 +48,4 @@ root -l -b -q "${NEUTRON_TOP_DIR}/utils/force_spill_like_4_singles.cpp(\"${OUT_F
 echo "Running convert2h5..."
 rm -f $OUTPUT_H5
 echo "Keep all dets? ${keepAllDets}"
-python3 ${SIM_DIR}/run-convert2h5/convert_edepsim_roottoh5.py --input_file "$OUT_FILE_SPILL" --output_file "$OUTPUT_H5" --gps True
+python3 ${NEUTRON_TOP_DIR}/run-convert2h5/convert_edepsim_roottoh5.py --input_file "$OUT_FILE_SPILL" --output_file "$OUTPUT_H5" --is_cosmic_sim False --gps True
