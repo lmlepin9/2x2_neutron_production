@@ -1,6 +1,6 @@
 # 2x2_neutron_production
 
-This repostitory contains auxiliary scripts for the production of neutron source MC files at NERSC. It is heavily inspired by the structure of [ND_PRODUCTION](https://github.com/DUNE/ND_Production/tree/main). 
+This repostitory contains auxiliary scripts for the production of neutron source MC files at NERSC. It is heavily inspired by the structure of [ND_PRODUCTION](https://github.com/DUNE/ND_Production/tree/main), and in fact it borrows many of its scripts. 
 
 
 # Setup the environment
