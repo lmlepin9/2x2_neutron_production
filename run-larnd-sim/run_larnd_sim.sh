@@ -4,29 +4,23 @@
 source ../util/reload_in_container.inc.sh
 source ../util/init.inc.sh
 
-export ND_PRODUCTION_RUNTIME="NONE"
+
+source "$NEUTRON_TOP_DIR/run-larnd-sim/larnd.venv/bin/activate"
 
 
-if [[ ( (-z "$ND_PRODUCTION_RUNTIME") || ("$ND_PRODUCTION_RUNTIME" == "NONE") )
-      || ( (-n "$ND_PRODUCTION_USE_LOCAL_PRODUCT") && ("$ND_PRODUCTION_USE_LOCAL_PRODUCT" != "0") ) ]]; then
-    # Allow overriding the container's /opt/venv
-    source "$ND_PRODUCTION_INSTALL_DIR/larnd.venv/bin/activate"
-fi
-
-#inDir=${ND_PRODUCTION_OUTDIR_BASE}/run-convert2h5/$ND_PRODUCTION_CONVERT2H5_NAME
-#inName=$ND_PRODUCTION_CONVERT2H5_NAME.$globalIdx
 inFile=$1
-
 outFile=$2
+nEvents=$3
+
 rm -f "$outFile"
 
+# Should I compress? 
 compression="None"
 if [[ "$ND_PRODUCTION_COMPRESS" != "" ]]; then
     echo "Enabling compression of HDF5 datasets with $ND_PRODUCTION_COMPRESS"
     compression="$ND_PRODUCTION_COMPRESS"
 fi
 
-cd "$ND_PRODUCTION_INSTALL_DIR"
 
 if [[ -n "$ND_PRODUCTION_LARNDSIM_CONFIG" ]]; then
     run simulate_pixels.py "$ND_PRODUCTION_LARNDSIM_CONFIG" \
@@ -43,7 +37,7 @@ else
     [ -z "$ND_PRODUCTION_LARNDSIM_SIMULATION_PROPERTIES" ] && export ND_PRODUCTION_LARNDSIM_SIMULATION_PROPERTIES="larnd-sim/larndsim/simulation_properties/2x2_NuMI_sim.yaml"
 
     run simulate_pixels.py --input_filename "$inFile" \
-        --n_events $3 \
+        --n_events $nEvents \
         --output_filename "$outFile" \
         --rand_seed "$seed" \
         --compression "$compression"
