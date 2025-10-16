@@ -1,39 +1,53 @@
  #!/user/bin/env bash
 
-# Setup dependencies
+ # Check that the top directory has been set
 
+if [ -z "${NEUTRON_TOP_DIR}" ]; then
+    echo "Error: NEUTRON_TOP_DIR is not set. Please source setup_production.sh in the top directory"
+    exit 1
+fi
+
+echo "NEUTRON_TOP_DIR is set to: ${NEUTRON_TOP_DIR}"
+
+
+# Setup container dependencies
 source /pscratch/sd/l/lmlepin/setup_2x2_container.sh
 
-# Geometry with no MINERvA 
-export ARCUBE_GEOM='/pscratch/sd/l/lmlepin/2x2_sim_develop/2x2_sim/geometry/Merged2x2MINERvA_v4_noRock_2x2_only_sense.gdml'
-export NEVENTS='50000'
-export SIM_DIR='/pscratch/sd/l/lmlepin/2x2_sim_develop/2x2_sim'
-export OUT_DIR='/global/cfs/cdirs/dune/users/lmlepin/2x2_neutron_prod/PNS_tests'
-export OUT_FILE="${OUT_DIR}/MR5_DTG_sim_updated_distribution.root"
-export MAC_FILE="${SIM_DIR}/run-edep-sim/macros/2x2_DTG_P385_single.mac"
+
+# Run edep-sim ------------------------------------------------------------------
+
+# Configure your edep-sim job here 
+ARCUBE_GEOM='/pscratch/sd/l/lmlepin/2x2_sim_develop/2x2_sim/geometry/Merged2x2MINERvA_v4_noRock_2x2_only_sense.gdml'
+NEVENTS='50000'
+OUT_DIR='/global/cfs/cdirs/dune/users/lmlepin/2x2_neutron_prod/PNS_tests'
+OUT_FILE="${OUT_DIR}/MR5_DTG_sim_updated_distribution.root"
+MAC_FILE="${SIM_DIR}/run-edep-sim/macros/2x2_DTG_P385_single.mac"
 #export MAC_FILE="${SIM_DIR}/run-edep-sim/macros/2x2_DTG_single_updated.mac"
 #export MAC_FILE="${SIM_DIR}/run-edep-sim/macros/2x2_source_test.mac"
-export PS_LIST='MyQGSP_BERT_ArHP'
-export OUT_NAME="DTG_P385_test"
+PS_LIST='MyQGSP_BERT_ArHP'
+OUT_NAME="DTG_P385_test"
 
 
-#edep-sim -C -g "$ARCUBE_GEOM" -o "$OUT_FILE" -p "$PS_LIST" -e "$NEVENTS" "$MAC_FILE"
+edep-sim -C -g "$ARCUBE_GEOM" -o "$OUT_FILE" -p "$PS_LIST" -e "$NEVENTS" "$MAC_FILE"
 
 
-# RUN NEUTRON SPILL BUILDER
+# RUN NEUTRON SPILL BUILDER -----------------------------------------------------
 
-export FILE_ID=1
-export PULSE_WIDTH=5e-6 # in s
-export ACC_VOLTAGE=40
-export CURRENT=20
-export FREQUENCY=10000.0
-export DUTY_FACTOR=0.05
-export OUT_FILE_SPILL="${OUT_DIR}/${OUT_NAME}.root"
+# Configure your PNS spills here 
+
+FILE_ID=1
+PULSE_WIDTH=5e-6 # in s
+ACC_VOLTAGE=40
+CURRENT=20
+FREQUENCY=10000.0
+DUTY_FACTOR=0.05
+OUT_FILE_SPILL="${OUT_DIR}/${OUT_NAME}.root"
 
 root -l -b -q  -e "gSystem->Load(\"$LIBTG4EVENT_DIR/libTG4Event.so\")" \
-                  "../DTG/utils/create_neutron_pulses.C(\"${OUT_FILE}\",${FILE_ID}, ${PULSE_WIDTH},${ACC_VOLTAGE}, ${CURRENT}, ${DUTY_FACTOR},\"${OUT_FILE_SPILL}\")"
+                  "${NEUTRON_TOP_DIR}/util/create_neutron_pulses.C(\"${OUT_FILE}\",${FILE_ID}, ${PULSE_WIDTH},${ACC_VOLTAGE}, ${CURRENT}, ${DUTY_FACTOR},\"${OUT_FILE_SPILL}\")"
 
-# Run convert2h5 
+
+# Run convert2h5  -----------------------------------------------------------------
 
 echo "Running convert2h5..."
 export OUTPUT_H5="${OUT_DIR}/${OUT_NAME}.EDEPSIM.hdf5"
@@ -46,5 +60,4 @@ export CPATH=$EDEPSIM/include/EDepSim:$CPATH
 
 export keepAllDets=False
 echo "Keep all dets? ${keepAllDets}"
-
-python3 ${SIM_DIR}/run-convert2h5/convert_edepsim_roottoh5.py --input_file "$OUT_FILE_SPILL" --output_file "$OUTPUT_H5" --gps True
+python3 ${NEUTRON_TOP_DIR}/run-convert2h5/convert_edepsim_roottoh5.py --input_file "$OUT_FILE_SPILL" --output_file "$OUTPUT_H5" --gps True
