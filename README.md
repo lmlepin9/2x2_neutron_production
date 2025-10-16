@@ -1,2 +1,15 @@
 # 2x2_neutron_production
-Scripts for neutron source MC production at NERSC. 
+
+This repostitory contains auxiliary scripts for the production of neutron source MC files at NERSC. It is heavily inspired by the structure of [ND_PRODUCTION](https://github.com/DUNE/ND_Production/tree/main). 
+
+
+# Setup the environment
+
+Before doing anything, you should declare the environment variables
+
+`source setup_production.sh`
+
+# Examples
+
+This repo includes interactive examples for the different stages of the production. There is also the option to pick between AmBe and pulsed neutron source (PNS) events. To check the examples go to: `./prod_examples`
+
