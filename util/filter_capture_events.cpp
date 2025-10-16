@@ -117,8 +117,8 @@ void filter_capture_events(std::string input_file,
                 // This is where the modification of the time occurs  
 
                 if(is_spill){
-                    int globalSpillId = int(1E3)*spillFileId + (n_captures+1);
-                    double event_time = (1e9)*EVENT_PERIOD*(n_captures+1);
+                    int globalSpillId = int(1E3)*spillFileId + (n_captures);
+                    double event_time = (1e9)*EVENT_PERIOD*(n_captures);
                     double old_event_time = 0.;
 
 
@@ -162,6 +162,7 @@ void filter_capture_events(std::string input_file,
                     }
                }
                else{
+            
                 event->EventId = n_captures; 
                }
 
