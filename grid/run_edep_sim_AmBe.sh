@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Check that the top directory has been set
+
+if [ -z "${NEUTRON_TOP_DIR}" ]; then
+    echo "Error: NEUTRON_TOP_DIR is not set. Please source setup_production.sh in the top directory"
+    exit 1
+fi
+
 echo "Running edep-sim, this are the variables used:"
 echo "NEVENTS: ${NEVENTS}"
 echo "PHYSLIST: ${PS_LIST}"
@@ -12,10 +19,7 @@ timestamp=$(date +%s)
 source $SCRATCH/setup_2x2_container.sh 
 
 # Where to look for the geometry
-export ARCUBE_GEOM='/pscratch/sd/l/lmlepin/2x2_sim_develop/2x2_sim/geometry/Merged2x2MINERvA_v4_noRock_2x2_only_sense.gdml'
-
-# Where to look for convert2hdf5 
-export TOP_DIR='/pscratch/sd/l/lmlepin/2x2_sim_develop/2x2_sim'
+export ARCUBE_GEOM="${NEUTRON_TOP_DIR}/Merged2x2MINERvA_v4_noRock_2x2_only_sense.gdml"
 
 
 # edep-sim output file
@@ -44,7 +48,7 @@ edep-sim -C -g "$ARCUBE_GEOM" -o "$OUT_FILE_ROOT" -p "$PS_LIST" -e "$NEVENTS" "$
 
 # Filter for captures 
 echo "Runnning neutron capture filter..."
-root -l -b -q "/pscratch/sd/l/lmlepin/2x2_neutron_sources/AmBe/utils/filter_capture_events.C(\"${OUT_FILE_ROOT}\",\"${OUT_FILE_SPILL}\", ${IS_SPILL}, ${JOB})"
+root -l -b -q "${NEUTRON_TOP_DIR}/util/filter_capture_events.C(\"${OUT_FILE_ROOT}\",\"${OUT_FILE_SPILL}\", ${IS_SPILL}, ${JOB})"
 
 
 # Here we perform the conversion from .root to hdf5 
@@ -55,11 +59,11 @@ echo "Running convert2h5 now..."
 # the container already.)
 export CPATH=$EDEPSIM/include/EDepSim:$CPATH
 
-python3 ${TOP_DIR}/run-convert2h5/convert_edepsim_roottoh5.py --input_file "$OUT_FILE_SPILL" --output_file "$OUT_FILE_HDF5" --gps True 
+python3 ${NEUTRON_TOP_DIR}/run-convert2h5/convert_edepsim_roottoh5.py --input_file "$OUT_FILE_SPILL" --output_file "$OUT_FILE_HDF5" --gps True 
 
 
 echo "Running time mod..."
-python3 /pscratch/sd/l/lmlepin/2x2_neutron_sources/AmBe/utils/force_capture_time.py "$OUT_FILE_HDF5" "$OUT_FILE_MOD_HDF5" $OFFSET_TIME 
+python3 ${NEUTRON_TOP_DIR}/util/force_capture_time.py "$OUT_FILE_HDF5" "$OUT_FILE_MOD_HDF5" $OFFSET_TIME 
 
 
 # Move edepsim outputs to output dir 
