@@ -15,7 +15,9 @@ def generate_random_time(time_window):
 
 
 
-def force_capture_time(input_file, output_file, random=False, time_window=(0.,9)):
+def force_capture_time(input_file, output_file, random=False, time_window=(0.,10.)):
+    
+    if(random): print("Running with random time option")
 
     '''
     This function iterates over the captures events in the input file 
@@ -128,19 +130,23 @@ def force_capture_time(input_file, output_file, random=False, time_window=(0.,9)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("Usage: python force_capture_time.py <input_file> <output_file> [offset_time]")
+    if len(sys.argv) < 4:
+        print("Usage: python force_capture_time.py <input_file> <output_file> <random_time> [time_window]")
         sys.exit(1)
 
     input_file = sys.argv[1]
     output_file = sys.argv[2]
+    random_time = sys.argv[3]
+    time_window = None 
 
-    if len(sys.argv) >=4:
-        offset_time = int(sys.argv[3])
+    if len(sys.argv) >=5:
+        time_window = sys.argv[4]
+        print(f"You have chosen your time window: {time_window}")
     else:
-        offset_time = 5 # default value
+        time_window = (0.,10.) # default value
+        print(f"Setting default time window {time_window}")
 
-    force_capture_time(input_file,output_file, offset_time)
+    force_capture_time(input_file,output_file, random_time,time_window)
 
 
 

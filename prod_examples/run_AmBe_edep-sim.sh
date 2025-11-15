@@ -16,12 +16,12 @@ source /pscratch/sd/l/lmlepin/setup_2x2_container.sh
 
 # --------------------- Configure your test here--------------------------------------------
 ARCUBE_GEOM="${NEUTRON_TOP_DIR}/geometry/Merged2x2MINERvA_v4_noRock_2x2_only_sense.gdml"
-NEVENTS='100000'
+NEVENTS='1000'
 OUT_DIR='/global/cfs/cdirs/dune/users/lmlepin/2x2_neutron_prod/AmBe_tests'
-MAC_FILE="${NEUTRON_TOP_DIR}/macros/2x2_AmBe_out_top_mod0.mac"
+MAC_FILE="${NEUTRON_TOP_DIR}/macros/2x2_AmBe_in_mod2.mac"
 PS_LIST="MyQGSP_BERT_ArHP"
-OUT_NAME="2x2_AmBe_top_mod0_10-16"
-CHANGE_TIME=0 # Pick 1 if forcing specific time for your captures 
+OUT_NAME="2x2_AmBe_in_mod2_random_time_test"
+CHANGE_TIME=1 # Pick 1 if forcing specific time for your captures 
 
 
 # --------------------- edep-sim --------------------------------------------
@@ -57,7 +57,7 @@ fi
 # --------------------- Force capture time  --------------------------------------------
 if [ $CHANGE_TIME == 1 ]; then
     OUTPUT_MOD_FILE="${OUT_DIR}/${OUT_NAME}_MOD.EDEPSIM.hdf5"
-    OFFSET_TIME=5
-    echo "You have selected to force the capture time to ${OFFSET_TIME}"
-    python3 /pscratch/sd/l/lmlepin/2x2_neutron_sources/AmBe/utils/force_capture_time.py "$OUTPUT_H5" "$OUTPUT_MOD_FILE" $OFFSET_TIME 
+    RANDOM=1
+    echo "You have selected to force the capture time"
+    python3 ${NEUTRON_TOP_DIR}/util/force_capture_time.py "$OUTPUT_H5" "$OUTPUT_MOD_FILE" $RANDOM 
 fi 
