@@ -4,9 +4,18 @@ import h5py
 import sys 
 import os 
 
+def generate_random_time(time_window):
+    '''
+    This function generates a uniform random time 
+    within a designated time window.
+    '''
+    random_time = np.random.rand()*(time_window[1] - time_window[0])
+    random_time += time_window[0]
+    return random_time 
 
 
-def force_capture_time(input_file, output_file, offset_time=5):
+
+def force_capture_time(input_file, output_file, random=False, time_window=(0.,9)):
 
     '''
     This function iterates over the captures events in the input file 
@@ -15,7 +24,8 @@ def force_capture_time(input_file, output_file, offset_time=5):
 
     input_file: input .hdf5 file with captures inside the 2x2 volume
     output_file: name of your output .hdf5 file 
-    offset_time: offset of the capture time in us 
+    random: Decide between fixed offset or offset from uniform random time
+    time_window: time window in us for random time  
     
     '''
 
@@ -68,6 +78,12 @@ def force_capture_time(input_file, output_file, offset_time=5):
             # Shift times
             capture_time = capture_time - ev["t_event"]
 
+
+            if(random):
+                offset_time = generate_random_time(time_window)
+            else:
+                offset_time = 5 # us 
+
             for field in ["t_start", "t_end"]:
                 if field in ev_traj.dtype.names:
                     ev_traj[field] = (ev_traj[field] - capture_time + offset_time) - ev["t_event"] + event_time
@@ -113,7 +129,7 @@ def force_capture_time(input_file, output_file, offset_time=5):
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Suage: python force_capture_time.py <input_file> <output_file> [offset_time]")
+        print("Usage: python force_capture_time.py <input_file> <output_file> [offset_time]")
         sys.exit(1)
 
     input_file = sys.argv[1]
